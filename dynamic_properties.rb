@@ -130,6 +130,9 @@ module Berico
       if property_name.nil?
         super
       else
+        # Monkey Patch the property so the next
+        # call doesn't go "missing"
+        self.patch_property property_name
         # if we are dealing with a getter
         if mode == :getter
           if @properties.has_key? property_name
@@ -143,6 +146,23 @@ module Berico
           @properties[property_name] = args[0]
         end
       end
+    end
+
+    # Monkey patch the existing class to have
+    # the property (thereby not incurring the
+    # overhead of a method_missing call)
+    # @param method_name [String] name of the method
+    # to add to the class.
+    def patch_property(method_name)
+      self.class.class_eval  %Q{
+         class #{self.class}
+           def #{method_name}
+             @properties['#{method_name}']
+           end
+           def #{method_name}=(value)
+             @properties['#{method_name}'] = value
+           end
+         end }
     end
 
   end

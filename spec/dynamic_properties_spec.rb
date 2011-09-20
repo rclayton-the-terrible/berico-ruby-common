@@ -126,6 +126,34 @@ module Berico
 
       end
 
+      context "monkey_patch" do
+
+        it "should create a new accessor and mutator for a property the first time it goes missing" do
+
+          richard_clayton = "Richard Clayton"
+
+          dp = BasicDynoClass.new
+          dp.name = richard_clayton
+
+          dp.methods.include?(:name).should == true
+          dp.methods.include?(:name=).should == true
+
+          dp.properties.length.should == 1
+          dp.properties["name"].should == richard_clayton
+          dp.name.should == richard_clayton
+
+          joe_black = "Joe Black"
+
+          dp.name = joe_black
+
+          dp.properties.length.should == 1
+          dp.properties["name"].should == joe_black
+          dp.name.should == joe_black
+
+        end
+
+      end
+
       context "Validation Functions" do
 
         it "should return whether a configuration hash is valid" do
